@@ -8,7 +8,9 @@ import * as XLSX from "xlsx";
 const App = () => {
   const [userList, setUserList] = useState([]);
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [encryptionKey, setEncryptionKey] = useState("");
+  const [encryptionKey, setEncryptionKey] = useState(
+    "U33038C9E4B0C4CBF6D7929C04348CBE1"
+  );
 
   useEffect(() => {
     fetch("https://randomuser.me/api/?results=20")

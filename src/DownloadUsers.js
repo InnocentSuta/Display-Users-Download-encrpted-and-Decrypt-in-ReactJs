@@ -5,22 +5,26 @@ import * as XLSX from "xlsx";
 
 const DownloadUsers = ({ userList }) => {
   const handleDownload = (format) => {
-    const encryptionKey = "Key";
+    const encryptionKey = "U33038C9E4B0C4CBF6D7929C04348CBE1";
     const encryptedData = AES.encrypt(
       JSON.stringify(userList),
       encryptionKey
     ).toString();
 
     if (format === "xls") {
+      // console.log(typeof userList);
+      // console.log(typeof encryptedData);
+      const worksheet = XLSX.utils.json_to_sheet([{ encryptedData }], {
+        skipHeader: true,
+      });
       const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet([{ encryptedData }]);
       XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
       const excelBuffer = XLSX.write(workbook, {
         bookType: "xlsx",
         type: "array",
       });
       const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
       });
       saveAs(blob, "encrypted_user_data.xlsx");
     } else if (format === "csv") {
