@@ -1,0 +1,39 @@
+import React from 'react';
+import * as FileSaver from 'file-saver';
+import { AES } from 'crypto-js';
+
+const ExportEncryptedCSV = ({ csvData, fileName }) => {
+  const fileType = 'text/csv;charset=UTF-8';
+ 
+  const exportToCSV = (csvData, fileName) => {
+    const encryptedCsvString = encryptCSVData(csvData);
+
+    const data = new Blob([encryptedCsvString], { type: fileType });
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    };
+     const currentDateTime = new Date().toLocaleString('en-US', options).replace(',', '');
+    FileSaver.saveAs(data, fileName+"_Encrypted_" +currentDateTime+ '.csv');
+  };
+
+  const encryptCSVData = (csvData) => {
+    const encryptionKey = "U33038C9E4B0C4CBF6D7929C04348CBE1";
+    const header = csvData.length > 0 ? Object.keys(csvData[0]).join(',') : '';
+    const rows = csvData.map((row) => Object.values(row).join(','));
+    const csvString = header + '\n' + rows.join('\n');
+
+    const encryptedCsvString = AES.encrypt(csvString, encryptionKey).toString();
+    return encryptedCsvString;
+  };
+
+  return (
+    <button onClick={(e) => exportToCSV(csvData, fileName)}>Export</button>
+  );
+};
+
+export default ExportEncryptedCSV;

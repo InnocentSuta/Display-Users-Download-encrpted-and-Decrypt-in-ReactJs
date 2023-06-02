@@ -1,0 +1,57 @@
+import React, { useState } from 'react';
+import * as FileSaver from 'file-saver';
+import { AES } from 'crypto-js';
+var CryptoJS = require("crypto-js");
+const DecryptUploadedCSV = () => {
+  const [encryptionKey, setEncryptionKey] = useState('');
+  
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const data = evt.target.result;
+      const decryptedCsvString = decryptCSVData(data);
+      exportToCSV(decryptedCsvString);
+    };
+    reader.readAsText(file);
+  };
+
+  const decryptCSVData = (encryptedData) => {
+    const decryptedCsvString = AES.decrypt(encryptedData, encryptionKey).toString(
+      CryptoJS.enc.Utf8
+    );
+    return decryptedCsvString;
+  };
+
+  const exportToCSV = (csvString) => {
+    const fileType = 'text/csv;charset=UTF-8';
+    const data = new Blob([csvString], { type: fileType });
+    //const formattedDate = currentDate.toISOString().slice(0, 10);//current date
+   // const currentDateTime = new Date().toISOString().replace(/[-:.]/g, '');
+   const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  };
+   const currentDateTime = new Date().toLocaleString('en-US', options).replace(',', '');
+    const fileName = `Merchant_Report_Decrypted_${currentDateTime}.csv`;
+    FileSaver.saveAs(data, fileName);
+  };
+
+  return (
+    <div>
+      <input type="file" accept=".csv" onChange={handleFileUpload} />
+      <input
+        type="text"
+        placeholder="Enter Encryption Key"
+        value={encryptionKey}
+        onChange={(e) => setEncryptionKey(e.target.value)}
+      />
+    </div>
+  );
+};
+
+export default DecryptUploadedCSV;
